@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper it re-implements."
+title: "Open re-implementation: Reinforcement Learning to Optimize the Distribution of Patients within the Hospital During Emergencies"
+type: software
+authors:
+  - family-names: Bondarenko
+    given-names: Gleb O.
+preferred-citation:
+  type: conference-paper
+  title: "Reinforcement Learning to Optimize the Distribution of Patients within the Hospital During Emergencies"
+  authors:
+    - {family-names: Bondarenko, given-names: Gleb O.}
+    - {family-names: Popova, given-names: Anastasia R.}
+    - {family-names: Syryh, given-names: Alyona S.}
+    - {family-names: Patoka, given-names: Yegor V.}
+    - {family-names: Geichenko, given-names: Evgenii I.}
+    - {family-names: Pavluk, given-names: Vladislav S.}
+  collection-title: "2025 XXVIII International Conference on Soft Computing and Measurements (SCM)"
+  start: 178
+  end: 181
+  year: 2025
+  doi: "10.1109/SCM66446.2025.11060263"

@@ -1,0 +1,1 @@
+{"lam_test": 1.362, "lam_train": 0.8, "crit_share": 0.282, "boxes": 6, "hw_scale": 0.8, "len_scale": 3.157, "quantile": 0.991, "qbin": 2, "noise": 0.0}

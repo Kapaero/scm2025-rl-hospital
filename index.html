@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RL Hospital Re-implementation</title>
+<meta name="description" content="Open re-implementation of the experiment from the SCM 2025 paper on reinforcement learning for patient distribution inside a hospital during emergencies.">
+<style>
+:root{--bg:#fff;--fg:#1c1f24;--muted:#5b6470;--line:#d9dde3;--accent:#2457c5;--card:#f5f7fa}
+@media (prefers-color-scheme:dark){:root{--bg:#14171c;--fg:#e6e9ee;--muted:#9aa4b2;--line:#2a2f37;--accent:#7aa2f7;--card:#1b1f26}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:860px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:1.7rem;line-height:1.25;margin:0 0 .4rem}
+h2{font-size:1.2rem;margin:2rem 0 .6rem}
+a{color:var(--accent)}
+.meta{color:var(--muted);font-size:.95rem}
+.note{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:1.2rem 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;white-space:nowrap}
+th{background:var(--card)}
+img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:6px}
+code,pre{font-family:ui-monospace,Consolas,monospace;font-size:.9rem}
+pre{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow-x:auto}
+li{margin:.25rem 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Reinforcement learning for patient distribution inside a hospital: open re-implementation</h1>
+<p class="meta">Code, parameters and a one-command reproduction of the experiment described in the paper below.</p>
+
+<div class="note">
+<strong>Paper.</strong> Bondarenko G. O., Popova A. R., Syryh A. S., Patoka Y. V., Geichenko E. I., Pavluk V. S.
+<em>Reinforcement Learning to Optimize the Distribution of Patients within the Hospital During Emergencies.</em>
+2025 XXVIII International Conference on Soft Computing and Measurements (SCM), pp. 178-181.
+DOI: <a href="https://doi.org/10.1109/SCM66446.2025.11060263">10.1109/SCM66446.2025.11060263</a>
+</div>
+
+<h2>What this is</h2>
+<p>The paper compares three controllers for moving patients through the corridors and boxes of an emergency department: GOAP (goal-oriented action planning),
+tabular reinforcement learning trained on cases recorded from GOAP, and a hybrid in which k-means clustering of the states decides whether RL or GOAP acts.
+The original code and the seed of the paper's case study were not preserved. This repository is an open re-implementation:
+the model is rebuilt from the paper's description, and its free parameters are calibrated so that the mean waiting times match the values read from the figures.</p>
+
+<h2>Model</h2>
+<ul>
+<li>Reception department with three one-lane corridors and several boxes; critical and non-critical patients.</li>
+<li>GOAP chooses the corridor by expected time; critical patients have priority in queues.</li>
+<li>RL is tabular Q-learning on cases recorded under GOAP; in an unfamiliar state it takes a default action.</li>
+<li>Hybrid: k-means (k = 5) over the states of the sample; if the current state is farther from the centres than a threshold, GOAP decides, otherwise RL.</li>
+</ul>
+
+<h2>Results</h2>
+<p>Targets read from the paper's figures (critical / non-critical, minutes): GOAP 14 / 21, pure RL 53 / 49, hybrid 19 / 23.</p>
+<p><strong>Single run as in the paper</strong> (seed 1; 70 critical and 203 non-critical patients)</p>
+<table>
+<thead><tr><th>Method</th><th>Critical, min</th><th>Non-critical, min</th></tr></thead>
+<tbody>
+<tr><td>GOAP</td><td>13.6 ± 0.6</td><td>22.2 ± 3.3</td></tr>
+<tr><td>Pure RL</td><td>48.9 ± 23.0</td><td>53.2 ± 21.6</td></tr>
+<tr><td>RL + clustering + GOAP</td><td>17.7 ± 7.2</td><td>21.6 ± 6.5</td></tr>
+</tbody>
+</table>
+<p><img src="figures/rl_case_hist.png" alt="Histograms of time to examination for GOAP, pure RL and the hybrid in the case study"></p>
+<p><strong>30 other seeds (101-130)</strong>, same load; mean over seeds ± SD between seeds</p>
+<table>
+<thead><tr><th>Method</th><th>Critical, min</th><th>Non-critical, min</th></tr></thead>
+<tbody>
+<tr><td>GOAP</td><td>13.7 ± 0.2</td><td>22.7 ± 1.2</td></tr>
+<tr><td>Pure RL</td><td>51.5 ± 10.9</td><td>52.4 ± 10.8</td></tr>
+<tr><td>RL + clustering + GOAP</td><td>18.8 ± 0.9</td><td>21.6 ± 1.1</td></tr>
+</tbody>
+</table>
+<p>Control with the training load: all three controllers give 13-15 minutes. The hybrid hands 48 % of the decisions to GOAP under the test load and 0 % under the training load.</p>
+
+<h2>Limits</h2>
+<ul>
+<li><strong>Calibrated, not independent.</strong> 8 free parameters were calibrated against 6 target means read from the figures. The agreement of the means is a result of calibration, and the parameter set is not unique.</li>
+<li><strong>Spread does not match.</strong> The model SD of GOAP for critical patients is 0.6 minutes against about 6 in the paper's figure; the SD of pure RL is 23 minutes against about 7.</li>
+<li><strong>Clustering picture.</strong> The PCA projection of the states is degenerate (two lines), so the paper's picture is not reproduced.</li>
+<li><strong>RL gap depends on the load.</strong> At the training load RL matches GOAP. The gap appears because the test load is higher than the one RL was trained on.</li>
+<li><strong>No clinical data.</strong> This is a simulation without real patients. No clinical conclusion follows from it.</li>
+<li><strong>Not the original code.</strong> The numbers describe this model, not the one that produced the paper. The paper's own figures are not reproduced here.</li>
+</ul>
+<p><img src="figures/rl_pca.png" alt="PCA projection of the clustered states" style="max-width:480px"></p>
+
+<h2>Run</h2>
+<pre>pip install -r requirements.txt
+python code/reconstruction_report.py results</pre>
+<p>The run takes a few seconds and is deterministic. It writes the tables and both figures. <code>code/fit_rl_params.py</code> and <code>code/fit_rl_stage2.py</code> repeat the parameter search; the chosen set is in <code>code/_fit_best.json</code>.</p>
+
+<h2>Files</h2>
+<ul>
+<li><code>code/reconstruct_rl_cluster.py</code> - model: corridors, boxes, GOAP, tabular RL, k-means contour</li>
+<li><code>code/reconstruction_report.py</code> - case study, other seeds, control, figures</li>
+<li><code>code/fit_rl_params.py</code>, <code>code/fit_rl_stage2.py</code>, <code>code/_fit_best.json</code> - parameter search and chosen parameters</li>
+</ul>
+</main>
+</body>
+</html>
