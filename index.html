@@ -78,12 +78,13 @@ the model is rebuilt from the paper's description, and its free parameters are c
 <ul>
 <li><strong>Calibrated, not independent.</strong> 8 free parameters were calibrated against 6 target means read from the figures. The agreement of the means is a result of calibration, and the parameter set is not unique.</li>
 <li><strong>Spread does not match.</strong> The model SD of GOAP for critical patients is 0.6 minutes against about 6 in the paper's figure; the SD of pure RL is 23 minutes against about 7.</li>
-<li><strong>Clustering picture.</strong> The PCA projection of the states is degenerate (two lines), so the paper's picture is not reproduced.</li>
+<li><strong>Clustering picture.</strong> In the model behind the tables the PCA projection of the states is degenerate (two lines, second figure below), so the paper's picture is not reproduced. The first figure is an illustration of the clustering step from a different variant of the model (v7, state = occupancy of nine corridors). It is not the model behind the tables, and its waiting times are not reported because they were not stable across seeds. In that variant the farthest test-load state lies below the threshold, so no state is flagged as unfamiliar in that picture.</li>
 <li><strong>RL gap depends on the load.</strong> At the training load RL matches GOAP. The gap appears because the test load is higher than the one RL was trained on.</li>
 <li><strong>No clinical data.</strong> This is a simulation without real patients. No clinical conclusion follows from it.</li>
 <li><strong>Not the original code.</strong> The numbers describe this model, not the one that produced the paper. The paper's own figures are not reproduced here.</li>
 </ul>
-<p><img src="figures/rl_pca.png" alt="PCA projection of the clustered states" style="max-width:480px"></p>
+<p><img src="figures/clusters_v7_illustration.png" alt="Clustering illustration from model variant v7: five clusters of corridor-occupancy states, PCA projection"></p>
+<p><img src="figures/rl_pca.png" alt="PCA projection of the clustered states in the model behind the tables" style="max-width:480px"></p>
 
 <h2>Run</h2>
 <pre>pip install -r requirements.txt
@@ -95,6 +96,7 @@ python code/reconstruction_report.py results</pre>
 <li><code>code/reconstruct_rl_cluster.py</code> - model: corridors, boxes, GOAP, tabular RL, k-means contour</li>
 <li><code>code/reconstruction_report.py</code> - case study, other seeds, control, figures</li>
 <li><code>code/fit_rl_params.py</code>, <code>code/fit_rl_stage2.py</code>, <code>code/_fit_best.json</code> - parameter search and chosen parameters</li>
+<li><code>code/variant_v7/</code> - variant v7 of the model, used only for the clustering illustration</li>
 </ul>
 </main>
 </body>

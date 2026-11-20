@@ -50,12 +50,14 @@ The hybrid hands 48 % of the decisions to GOAP under the test load and 0 % under
 
 - **Calibrated, not independent.** 8 free parameters were calibrated against 6 target means read from the figures. The agreement of the means is a result of calibration. The parameter set is not unique.
 - **Spread of the distributions does not match.** The SD of GOAP for critical patients in the model is 0.6 minutes against about 6 in the figure of the paper. The SD of pure RL is 23 minutes against about 7 in the figure.
-- **Clustering picture.** The PCA projection of the states is degenerate (two lines), so the picture of the paper is not reproduced.
+- **Clustering picture.** In the model behind the tables the PCA projection of the states is degenerate (two lines, second figure below), so the picture of the paper is not reproduced. The first figure below is an illustration of the clustering step from a different variant of the model (v7, state = occupancy of nine corridors). It is not the model behind the tables, and its waiting times are not reported because they were not stable across seeds. In that variant the farthest test-load state lies below the threshold, so no state is flagged as unfamiliar in that picture.
 - **Pure RL is fragile only outside the training load.** At the training load RL matches GOAP; the gap appears because the test load is higher than the one RL was trained on. This is a property of this model.
 - **Not clinical data.** The model is a simulation without real patients. No clinical conclusion follows from it.
 - **Not the original code.** The numbers describe this model, not the model that produced the paper.
 
-![PCA of states](figures/rl_pca.png)
+![Clustering illustration, variant v7](figures/clusters_v7_illustration.png)
+
+![PCA of states, model behind the tables](figures/rl_pca.png)
 
 ## Run
 
@@ -73,6 +75,7 @@ Code comments are partly in Russian.
 - `code/reconstruct_rl_cluster.py` - the model: corridors, boxes, GOAP, tabular RL, k-means contour.
 - `code/reconstruction_report.py` - case study, other seeds, control, figures.
 - `code/fit_rl_params.py`, `code/fit_rl_stage2.py`, `code/_fit_best.json` - parameter search and the chosen parameters.
+- `code/variant_v7/` - variant v7 of the model, used only for the clustering illustration (`python code/variant_v7/cluster_figure.py results`).
 - `results.md`, `figures/` - output of the last run.
 
 The figures of the paper are not included. They belong to the publisher.
