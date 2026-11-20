@@ -54,7 +54,7 @@ rng = np.random.default_rng(3)
 C = R.kmeans(P, 5, rng)
 lab = np.argmin(((P[:, None] - C[None]) ** 2).sum(-1), 1)
 dtr = np.min(np.linalg.norm(P[:, None] - C[None], axis=2), 1)
-tau = np.quantile(dtr, 0.99)
+tau = np.quantile(dtr, p["quantile"])  # threshold quantile of the model itself (0.903 in _v7_plain.json)
 dte = np.min(np.linalg.norm(Pt[:, None] - C[None], axis=2), 1)
 far = int(np.argmax(dte))
 print("explained variance PC1, PC2:", np.round((S ** 2 / (S ** 2).sum())[:2], 3),
@@ -67,9 +67,9 @@ for k in range(5):
     m = lab[idx] == k
     ax.scatter(P[idx][m, 0], P[idx][m, 1], s=22, label=f"Cluster {k}")
 ax.scatter(C[:, 0], C[:, 1], marker="X", s=200, c="k", label="Centres")
-verdict = "above" if dte[far] > tau else "below"
+verdict = "rejected as unfamiliar" if dte[far] > tau else "within the contour"
 ax.scatter(*np.clip(Pt[far], -0.05, 1.05), marker="*", s=180, c="r",
-           label=f"Farthest test-load state (distance {dte[far]:.2f}, {verdict} threshold {tau:.2f})")
+           label=f"Farthest test-load state (distance {dte[far]:.2f}, threshold {tau:.2f}: {verdict})")
 ax.set_title("Model variant v7: occupancy of 9 corridors at the moment of decision, PCA and k-means")
 ax.set_xlabel("PCA 1")
 ax.set_ylabel("PCA 2")
